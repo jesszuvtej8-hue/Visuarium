@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visuarium - Descubre tu Técnica y Voz Artística Única</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        art: {
+                            dark: '#08070d',
+                            panel: 'rgba(18, 16, 28, 0.75)',
+                            purple: '#8b5cf6',
+                            magenta: '#d946ef',
+                            cyan: '#06b6d4',
+                            gold: '#f59e0b',
+                            rose: '#f43f5e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                        'float': 'float 6s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #07060b;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        .font-serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d0b14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2438;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8b5cf6;
+        }
+        .glass-panel {
+            background: rgba(18, 15, 28, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(26, 22, 40, 0.5);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(217, 70, 239, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px -10px rgba(139, 92, 246, 0.25);
+        }
+        .gradient-text-art {
+            background: linear-gradient(135deg, #f59e0b 0%, #d946ef 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-text-gold {
+            background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body x-data="visuariumApp()" class="antialiased selection:bg-art-magenta selection:text-white">
+
+    <!-- Atmospheric Glow Backgrounds -->
+    <div class="fixed top-[-10%] left-[-10%] w-[600px] h-[600px] bg-art-purple/15 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+    <div class="fixed bottom-[-10%] right-[-5%] w-[700px] h-[700px] bg-art-magenta/10 rounded-full blur-[180px] pointer-events-none -z-10"></div>
+    <div class="fixed top-[40%] right-[30%] w-[400px] h-[400px] bg-art-cyan/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" @click="scrollTo('hero')">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-art-gold via-art-magenta to-art-cyan p-[2px]">
+                        <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                            <i class="fa-solid fa-palette text-art-magenta text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black font-serif-title tracking-wide text-white block leading-none">
+                            Visuarium
+                        </span>
+                        <span class="text-[9px] font-mono text-art-gold uppercase tracking-widest block mt-1">Art Tech & Identity</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+                    <a href="#vibe-studio" class="hover:text-art-magenta transition-colors flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-art-magenta animate-ping"></span>
+                        Vibe Art Studio
+                    </a>
+                    <a href="#quiz" class="hover:text-art-cyan transition-colors">Test de Artista</a>
+                    <a href="#courses" class="hover:text-art-gold transition-colors">Cursos & Workshops</a>
+                    <a href="#gallery" class="hover:text-slate-100 transition-colors">Galería</a>
+                    <a href="#pricing" class="hover:text-slate-100 transition-colors">Membresía</a>
+                </div>
+
+                <!-- CTA Actions -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <button @click="openModal('login')" class="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition">
+                        Ingresar
+                    </button>
+                    <button @click="openModal('subscribe')" class="px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-art-gold via-art-magenta to-art-cyan hover:opacity-90 transition shadow-[0_0_20px_rgba(217,70,239,0.3)] hover:scale-105 transform duration-300">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Prueba Gratis
+                    </button>
+                </div>
+
+                <!-- Mobile Trigger -->
+                <div class="md:hidden flex items-center">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-slate-300 hover:text-white p-2">
+                        <i class="fa-solid" :class="mobileMenuOpen ? 'fa-xmark text-xl' : 'fa-bars text-xl'"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden glass-panel border-b border-white/10 px-6 pt-3 pb-6 space-y-3">
+            <a href="#vibe-studio" @click="mobileMenuOpen = false" class="block py-2 text-art-magenta font-semibold">🎨 Vibe Art Studio Gratis</a>
+            <a href="#quiz" @click="mobileMenuOpen = false" class="block py-2 text-slate-300">✨ Test "Qué Artista Eres"</a>
+            <a href="#courses" @click="mobileMenuOpen = false" class="block py-2 text-slate-300">📚 Cursos & Talleres</a>
+            <a href="#gallery" @click="mobileMenuOpen = false" class="block py-2 text-slate-300">🖼️ Galería Comunidad</a>
+            <a href="#pricing" @click="mobileMenuOpen = false" class="block py-2 text-slate-300">💎 Planes</a>
+            <div class="pt-4 border-t border-slate-800 flex flex-col gap-2">
+                <button @click="openModal('login'); mobileMenuOpen = false" class="w-full py-2.5 rounded-xl border border-slate-700 text-slate-200 text-xs font-bold">Iniciar Sesión</button>
+                <button @click="openModal('subscribe'); mobileMenuOpen = false" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-art-gold to-art-magenta text-slate-950 font-bold text-xs uppercase tracking-wider">Comenzar Prueba Gratis</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="relative pt-12 pb-16 md:pt-20 md:pb-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-4xl mx-auto space-y-6">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card border border-art-gold/30 text-art-gold text-xs font-mono uppercase tracking-widest">
+                    <i class="fa-solid fa-sparkles text-art-magenta"></i>
+                    Descubre tu ADN Creativo & Técnica Única
+                </div>
+
+                <!-- Main Heading -->
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black font-serif-title tracking-tight text-white leading-tight">
+                    No imites el arte. <br>
+                    <span class="gradient-text-art">Encuentra tu propio Lenguaje Visual.</span>
+                </h1>
+
+                <p class="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
+                    Visuarium combina sensibilidad plástica, investigación conceptual e inteligencia digital para ayudarte a definir qué tipo de artista eres y crear obras con identidad inconfundible.
+                </p>
+
+                <!-- Hero CTA Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                    <a href="#vibe-studio" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-art-magenta via-purple-600 to-art-cyan text-white font-extrabold text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(217,70,239,0.35)] hover:scale-105 transition duration-300 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-paintbrush"></i>
+                        Probar Studio "Vibe Art" Gratis
+                    </a>
+                    <a href="#quiz" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-card text-slate-200 font-bold text-sm hover:border-art-gold/50 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-compass text-art-gold"></i>
+                        Hacer Test de Personalidad Artística
+                    </a>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto text-center border-t border-white/5">
+                    <div>
+                        <p class="text-2xl sm:text-3xl font-black text-white font-serif-title">4 Tipologías</p>
+                        <p class="text-xs text-slate-400 mt-1">De Lenguaje Artístico</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl sm:text-3xl font-black text-art-gold font-serif-title">+8,400</p>
+                        <p class="text-xs text-slate-400 mt-1">Artistas Registrados</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl sm:text-3xl font-black text-art-magenta font-serif-title">100%</p>
+                        <p class="text-xs text-slate-400 mt-1">Práctica & Proyectos</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl sm:text-3xl font-black text-art-cyan font-serif-title">4.9/5 ★</p>
+                        <p class="text-xs text-slate-400 mt-1">Valoración de Alumnos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: INTERACTIVE VIBE ART STUDIO (FREE TRIAL DEMO) -->
+    <section id="vibe-studio" class="py-16 bg-slate-950/80 border-y border-white/5 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-art-cyan font-mono text-xs uppercase tracking-widest">Prueba Interactiva sin Costo</span>
+                <h2 class="text-3xl sm:text-5xl font-black font-serif-title text-white mt-1">Sandbox de "Vibe Art"</h2>
+                <p class="text-slate-400 text-sm mt-2">
+                    Ajusta los prompts artísticos, texturas y estados de ánimo visual. La inteligencia de Visuarium simulará en tiempo real paletas, intenciones y directrices de técnica para tu próxima obra.
+                </p>
+            </div>
+
+            <!-- Studio Canvas & Controls Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Controls Side (Left) -->
+                <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-white/10 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center gap-2 mb-4">
+                            <i class="fa-solid fa-sliders text-art-magenta"></i>
+                            Configura tu Vibe Artístico:
+                        </h3>
+
+                        <!-- Preset Styles -->
+                        <div class="space-y-2.5 mb-6">
+                            <label class="text-xs font-mono text-slate-400">Selecciona una intención/corriente:</label>
+                            <div class="grid grid-cols-1 gap-2">
+                                <template x-for="(style, index) in artStyles" :key="index">
+                                    <button 
+                                        @click="selectArtStyle(index)"
+                                        :class="selectedStyleIndex === index ? 'border-art-magenta bg-art-magenta/15 text-white' : 'border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'"
+                                        class="w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between text-xs font-medium">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-art-gold">
+                                                <i :class="style.icon"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-slate-100" x-text="style.name"></div>
+                                                <div class="text-[10px] text-slate-400" x-text="style.subtitle"></div>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-[10px]" :class="selectedStyleIndex === index ? 'text-art-magenta' : 'text-slate-600'"></i>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Sliders for Texture / Vibration / Light -->
+                        <div class="space-y-4 pt-4 border-t border-white/5">
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1">
+                                    <span class="text-slate-400">Densidad de Textura:</span>
+                                    <span class="text-art-gold font-bold" x-text="textureVal + '%'"></span>
+                                </div>
+                                <input type="range" min="10" max="100" x-model="textureVal" @input="updateCanvas()" class="w-full accent-art-gold h-1 bg-slate-800 rounded-lg cursor-pointer">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1">
+                                    <span class="text-slate-400">Vibración Cromática:</span>
+                                    <span class="text-art-magenta font-bold" x-text="colorVal + '%'"></span>
+                                </div>
+                                <input type="range" min="10" max="100" x-model="colorVal" @input="updateCanvas()" class="w-full accent-art-magenta h-1 bg-slate-800 rounded-lg cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- Custom Prompt -->
+                        <div class="mt-5">
+                            <label class="block text-xs font-mono text-slate-400 mb-2">Prompt de Invocación Personal:</label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    x-model="customArtPrompt"
+                                    @keydown.enter="applyCustomPrompt()"
+                                    placeholder="Ej: Niebla dorada con trazos agresivos de carbón y tinta..." 
+                                    class="w-full bg-slate-900/90 border border-slate-700 focus:border-art-magenta rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none pr-10 font-mono">
+                                <button @click="applyCustomPrompt()" class="absolute right-2 top-2 p-1.5 rounded-lg bg-art-magenta text-white text-xs hover:bg-fuchsia-600 transition">
+                                    <i class="fa-solid fa-sparkles"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                        <span>Visuarium AI Engine v3.2</span>
+                        <span class="text-emerald-400">● Modulo Interactivo</span>
+                    </div>
+                </div>
+
+                <!-- Canvas Visualizer Side (Right) -->
+                <div class="lg:col-span-7 glass-panel rounded-3xl border border-white/10 flex flex-col justify-between overflow-hidden">
+                    
+                    <!-- Canvas Top Bar -->
+                    <div class="bg-slate-900/80 px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                            <span class="ml-2 text-xs font-mono text-slate-400">interactive-art-canvas.gpu</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button @click="clearCanvas()" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs hover:bg-slate-700 transition font-mono">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> Limpiar
+                            </button>
+                            <button @click="randomizeArt()" class="px-2.5 py-1 rounded-lg bg-art-purple/20 text-art-purple text-xs hover:bg-art-purple/30 transition font-mono">
+                                <i class="fa-solid fa-dice mr-1"></i> Mutar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- HTML5 Interactive Painting Canvas -->
+                    <div class="p-4 bg-black/60 relative min-h-[350px] flex items-center justify-center">
+                        <canvas id="artCanvas" class="w-full h-[320px] rounded-2xl cursor-crosshair border border-white/5 shadow-inner"></canvas>
+                        
+                        <div class="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-slate-950/80 backdrop-blur-md border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div>
+                                <p class="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-lightbulb text-art-gold"></i>
+                                    Diagnóstico de Técnica Sugerida:
+                                </p>
+                                <p class="text-xs text-slate-300 mt-0.5" x-text="currentTechniqueAdvice"></p>
+                            </div>
+                            <button @click="openModal('subscribe', 'Prueba Sandbox')" class="shrink-0 px-4 py-2 rounded-lg bg-gradient-to-r from-art-gold to-art-magenta text-slate-950 font-black text-xs uppercase tracking-wider hover:opacity-90 transition">
+                                Guardar mi Paleta
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Bottom Palette Bar -->
+                    <div class="p-4 bg-slate-900/60 border-t border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-mono text-slate-400">Paleta Generada:</span>
+                            <div class="flex items-center space-x-1.5">
+                                <template x-for="color in currentPalette" :key="color">
+                                    <div class="w-6 h-6 rounded-full border border-white/20 transition-transform hover:scale-125" :style="'background-color:' + color" :title="color"></div>
+                                </template>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-500 hidden sm:inline">Dibuja sobre el lienzo para interactuar</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION: QUIZ "QUÉ TIPO DE ARTISTA ERES" -->
+    <section id="quiz" class="py-20 relative">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-art-gold font-mono text-xs uppercase tracking-widest">Diagnóstico Expres de Identidad</span>
+                <h2 class="text-3xl sm:text-5xl font-black font-serif-title text-white mt-1">¿Qué Tipo de Artista Eres?</h2>
+                <p class="text-slate-400 text-sm mt-2">Responde estas 3 preguntas reflexivas y descubre la arquetipificación de tu técnica creativa.</p>
+            </div>
+
+            <!-- Quiz Container Card -->
+            <div class="glass-panel p-6 sm:p-10 rounded-3xl border border-white/10 relative shadow-2xl">
+                
+                <!-- Progress Bar -->
+                <div x-show="!quizCompleted" class="mb-8">
+                    <div class="flex justify-between text-xs font-mono text-slate-400 mb-2">
+                        <span>Pregunta <span x-text="quizStep + 1"></span> de <span x-text="quizQuestions.length"></span></span>
+                        <span x-text="Math.round(((quizStep + 1) / quizQuestions.length) * 100) + '% Completado'"></span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-art-gold via-art-magenta to-art-cyan transition-all duration-500" :style="'width: ' + (((quizStep + 1) / quizQuestions.length) * 100) + '%'"></div>
+                    </div>
+                </div>
+
+                <!-- Active Question -->
+                <template x-if="!quizCompleted">
+                    <div class="space-y-6">
+                        <h3 class="text-xl sm:text-2xl font-bold text-white font-serif-title" x-text="quizQuestions[quizStep].question"></h3>
+                        
+                        <div class="grid grid-cols-1 gap-3.5">
+                            <template x-for="(option, oIdx) in quizQuestions[quizStep].options" :key="oIdx">
+                                <button 
+                                    @click="answerQuestion(option.archetype)"
+                                    class="w-full text-left p-4 rounded-2xl glass-card border border-white/5 hover:border-art-magenta/60 hover:bg-slate-900/80 transition-all flex items-start gap-4 group">
+                                    <div class="w-7 h-7 rounded-xl bg-slate-800 group-hover:bg-art-magenta group-hover:text-white text-slate-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 transition">
+                                        <span x-text="String.fromCharCode(65 + oIdx)"></span>
+                                    </div>
+                                    <div class="text-xs sm:text-sm text-slate-200 pt-1" x-text="option.text"></div>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Quiz Result -->
+                <template x-if="quizCompleted">
+                    <div class="text-center py-6 space-y-6 animate-fadeIn">
+                        <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-art-gold via-art-magenta to-art-cyan p-[2px] mx-auto animate-bounce">
+                            <div class="w-full h-full bg-slate-950 rounded-[22px] flex items-center justify-center text-3xl text-art-gold">
+                                <i :class="archetypeResults[userArchetype].icon"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-mono text-art-gold uppercase tracking-widest">Tu Arquetipo Artístico Es:</span>
+                            <h3 class="text-3xl sm:text-4xl font-black font-serif-title text-white mt-1" x-text="archetypeResults[userArchetype].title"></h3>
+                        </div>
+
+                        <p class="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed" x-text="archetypeResults[userArchetype].description"></p>
+
+                        <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/5 max-w-md mx-auto text-xs text-left font-mono">
+                            <span class="text-art-magenta font-bold">✨ Recomendación Visuarium:</span>
+                            <p class="text-slate-300 mt-1" x-text="archetypeResults[userArchetype].recommendation"></p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                            <button @click="openModal('subscribe', 'Perfil: ' + archetypeResults[userArchetype].title)" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-art-gold to-art-magenta text-slate-950 font-black text-xs uppercase tracking-wider hover:opacity-90 transition shadow-lg">
+                                Explorar Cursos para mi Perfil
+                            </button>
+                            <button @click="resetQuiz()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl glass-card text-slate-300 text-xs font-bold hover:text-white">
+                                Repetir Test
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: CURSOS Y WORKSHOPS -->
+    <section id="courses" class="py-20 bg-slate-950/60 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div>
+                    <span class="text-art-magenta font-mono text-xs uppercase tracking-widest">Formación de Vanguardia</span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-serif-title text-white mt-1">Programas & Workshops</h2>
+                    <p class="text-slate-400 text-sm mt-2">Aprende a dominar tu voz, materiales tradicionales e integración con herramientas digitales.</p>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 font-mono text-xs">
+                    <button @click="courseFilter = 'all'" :class="courseFilter === 'all' ? 'bg-art-magenta text-white font-bold' : 'glass-card text-slate-300 hover:text-white'" class="px-4 py-2 rounded-xl transition">Todos</button>
+                    <button @click="courseFilter = 'tecnica'" :class="courseFilter === 'tecnica' ? 'bg-art-magenta text-white font-bold' : 'glass-card text-slate-300 hover:text-white'" class="px-4 py-2 rounded-xl transition">Técnica & Materia</button>
+                    <button @click="courseFilter = 'digital'" :class="courseFilter === 'digital' ? 'bg-art-magenta text-white font-bold' : 'glass-card text-slate-300 hover:text-white'" class="px-4 py-2 rounded-xl transition">Vibe Art & IA</button>
+                    <button @click="courseFilter = 'concepto'" :class="courseFilter === 'concepto' ? 'bg-art-magenta text-white font-bold' : 'glass-card text-slate-300 hover:text-white'" class="px-4 py-2 rounded-xl transition">Discurso Artístico</button>
+                </div>
+            </div>
+
+            <!-- Course Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <template x-for="course in filteredCourses" :key="course.id">
+                    <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between border border-white/5 hover:border-art-magenta/50 group transition duration-300">
+                        <div>
+                            <!-- Course Header Image -->
+                            <div class="relative h-52 overflow-hidden bg-slate-900">
+                                <img :src="course.image" :alt="course.title" class="w-full h-full object-cover group-hover:scale-110 transition duration-700 opacity-80 group-hover:opacity-100">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                                <div class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono text-art-gold border border-art-gold/30 uppercase tracking-wider" x-text="course.level"></div>
+                                <div class="absolute top-3 right-3 bg-art-magenta text-white font-bold text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-lg" x-text="course.badge"></div>
+                            </div>
+
+                            <!-- Course Body -->
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 text-xs text-slate-400 mb-2 font-mono">
+                                    <span><i class="fa-regular fa-clock text-art-cyan mr-1"></i> <span x-text="course.duration"></span></span>
+                                    <span>•</span>
+                                    <span><i class="fa-solid fa-layer-group text-art-gold mr-1"></i> <span x-text="course.modules"></span> módulos</span>
+                                </div>
+                                <h3 class="text-xl font-bold font-serif-title text-white group-hover:text-art-gold transition mb-2" x-text="course.title"></h3>
+                                <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 mb-4" x-text="course.description"></p>
+
+                                <!-- Instructor -->
+                                <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-slate-800 text-art-magenta font-bold flex items-center justify-center text-xs" x-text="course.instructorInitials"></div>
+                                        <span class="text-slate-300 font-medium" x-text="course.instructor"></span>
+                                    </div>
+                                    <div class="flex items-center gap-1 text-art-gold font-bold">
+                                        <i class="fa-solid fa-star text-xs"></i>
+                                        <span x-text="course.rating"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="p-6 pt-0 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-slate-500 line-through" x-text="course.oldPrice"></span>
+                                <div class="text-2xl font-black text-white font-mono" x-text="course.price"></div>
+                            </div>
+                            <button @click="openModal('subscribe', course.title)" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-art-gold to-art-magenta text-slate-950 font-black text-xs uppercase tracking-wider hover:opacity-90 transition shadow-lg flex items-center gap-1.5">
+                                Ver Detalles <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION: GALERIA DE COMUNIDAD DE ARTISTAS -->
+    <section id="gallery" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-art-cyan font-mono text-xs uppercase tracking-widest">Exposición de Alumnos</span>
+                <h2 class="text-3xl sm:text-5xl font-black font-serif-title text-white mt-1">Obras Nacidas en Visuarium</h2>
+                <p class="text-slate-400 text-sm mt-2">Cada obra refleja el sello único de su creador tras aplicar nuestra metodología de búsqueda de técnica.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <template x-for="(art, idx) in galleryItems" :key="idx">
+                    <div class="glass-card rounded-2xl overflow-hidden group border border-white/5">
+                        <div class="relative h-64 overflow-hidden">
+                            <img :src="art.image" :alt="art.title" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-end">
+                                <span class="text-[10px] font-mono text-art-gold uppercase tracking-wider" x-text="art.archetype"></span>
+                                <h4 class="text-lg font-bold text-white font-serif-title" x-text="art.title"></h4>
+                                <p class="text-xs text-slate-300 mt-1" x-text="'Por: ' + art.author"></p>
+                                <span class="text-[10px] text-art-cyan mt-2 font-mono" x-text="'Técnica: ' + art.technique"></span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: PRECIOS Y MEMBRESIA -->
+    <section id="pricing" class="py-20 bg-slate-950/80 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-art-gold font-mono text-xs uppercase tracking-widest">Acceso Completo</span>
+                <h2 class="text-3xl sm:text-5xl font-black font-serif-title text-white mt-1">Membresía Visuarium Pass</h2>
+                <p class="text-slate-400 text-sm mt-3">Desbloquea todos los talleres, asesoría personalizada de portafolio y el Vibe Art Studio en la nube.</p>
+                
+                <!-- Toggle Billing -->
+                <div class="mt-8 inline-flex items-center p-1.5 rounded-2xl bg-slate-900 border border-white/10">
+                    <button @click="billingCycle = 'monthly'" :class="billingCycle === 'monthly' ? 'bg-art-magenta text-white font-bold' : 'text-slate-400'" class="px-5 py-2 rounded-xl text-xs font-mono transition">Mensual</button>
+                    <button @click="billingCycle = 'yearly'" :class="billingCycle === 'yearly' ? 'bg-art-magenta text-white font-bold' : 'text-slate-400'" class="px-5 py-2 rounded-xl text-xs font-mono transition flex items-center gap-2">
+                        Anual <span class="bg-art-gold text-slate-950 text-[9px] px-2 py-0.5 rounded-full font-sans font-black uppercase">-35% DESC</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+                <!-- Free Plan -->
+                <div class="glass-card p-8 rounded-3xl border border-white/5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Pase Explorador</h3>
+                        <p class="text-xs text-slate-400 mb-6">Para probar herramientas y hacer el test.</p>
+                        <div class="text-4xl font-black text-white font-mono mb-6">$0 <span class="text-xs font-normal text-slate-400">/ libre</span></div>
+                        
+                        <ul class="space-y-3 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-gold"></i> Test completo "Qué Artista Eres"</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-gold"></i> Sandbox Vibe Art en modo básico</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-gold"></i> Acceso a la Galería Abierta</li>
+                            <li class="flex items-center gap-2 text-slate-600"><i class="fa-solid fa-xmark"></i> Sin cursos ni tutorías live</li>
+                        </ul>
+                    </div>
+                    <button @click="openModal('subscribe', 'Pase Explorador')" class="mt-8 w-full py-3 rounded-xl border border-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider hover:bg-slate-800 transition">
+                        Crear Cuenta Gratis
+                    </button>
+                </div>
+
+                <!-- Pro Plan (Featured) -->
+                <div class="glass-card p-8 rounded-3xl border-2 border-art-magenta relative flex flex-col justify-between bg-slate-900/90 shadow-[0_0_40px_rgba(217,70,239,0.2)]">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-art-gold to-art-magenta text-slate-950 font-black text-[10px] uppercase tracking-widest px-4 py-1 rounded-full shadow-lg">
+                        Más Recomendado
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Visuarium Pro</h3>
+                        <p class="text-xs text-slate-400 mb-6">Acceso total para consolidar tu carrera artística.</p>
+                        <div class="text-4xl font-black text-art-gold font-mono mb-6" x-text="billingCycle === 'monthly' ? '$25 / mes' : '$195 / año'"></div>
+                        
+                        <ul class="space-y-3 text-xs text-slate-200">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-magenta"></i> Acceso a todos los Cursos & Workshops</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-magenta"></i> Generador Vibe Art Studio Ilimitado</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-magenta"></i> Revisiones Mensuales de Portafolio</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-magenta"></i> Comunidad Privada de Artistas</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-magenta"></i> Certificado de Técnica Acreditada</li>
+                        </ul>
+                    </div>
+                    <button @click="openModal('subscribe', 'Visuarium Pro')" class="mt-8 w-full py-3.5 rounded-xl bg-gradient-to-r from-art-gold via-art-magenta to-art-cyan text-slate-950 font-black text-xs uppercase tracking-wider hover:opacity-90 transition shadow-lg">
+                        Iniciar 7 Días Gratis
+                    </button>
+                </div>
+
+                <!-- Master Plan -->
+                <div class="glass-card p-8 rounded-3xl border border-white/5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Master Patron</h3>
+                        <p class="text-xs text-slate-400 mb-6">Para artistas buscando exposición en galerías.</p>
+                        <div class="text-4xl font-black text-art-cyan font-mono mb-6">$450 <span class="text-xs font-normal text-slate-400">/ pago único</span></div>
+                        
+                        <ul class="space-y-3 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-cyan"></i> Membresía Pro de por vida</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-cyan"></i> Mentoría 1-a-1 con Curadores de Arte</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-cyan"></i> Promoción destacada en la Galería Visuarium</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-art-cyan"></i> Guía para venta de obra física y digital</li>
+                        </ul>
+                    </div>
+                    <button @click="openModal('subscribe', 'Master Patron')" class="mt-8 w-full py-3 rounded-xl border border-art-cyan text-art-cyan font-bold text-xs uppercase tracking-wider hover:bg-art-cyan hover:text-slate-950 transition">
+                        Obtener Acceso Vitalicio
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-white/5 pt-16 pb-12 text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-palette text-art-magenta text-xl"></i>
+                        <span class="text-xl font-bold font-serif-title text-white">Visuarium</span>
+                    </div>
+                    <p class="text-slate-500 leading-relaxed">
+                        Plataforma de investigación estética, autodescubrimiento de técnica y formación de artistas contemporáneos.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-mono uppercase tracking-wider">Navegación</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#vibe-studio" class="hover:text-art-magenta transition">Vibe Art Studio</a></li>
+                        <li><a href="#quiz" class="hover:text-art-magenta transition">Test de Personalidad Artística</a></li>
+                        <li><a href="#courses" class="hover:text-art-magenta transition">Catálogo de Cursos</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-mono uppercase tracking-wider">Comunidad</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-art-gold transition"><i class="fa-brands fa-instagram mr-1"></i> Instagram @VisuariumArt</a></li>
+                        <li><a href="#" class="hover:text-art-gold transition"><i class="fa-brands fa-facebook mr-1"></i> Facebook Visuarium</a></li>
+                        <li><a href="#" class="hover:text-art-gold transition"><i class="fa-brands fa-discord mr-1"></i> Discord de Creativos</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-mono uppercase tracking-wider">Boletín de Inspiración</h4>
+                    <p class="text-slate-500 mb-3">Recibe ejercicios de técnica y ensayos sobre historia del arte cada semana.</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="tu@artdomain.com" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-art-magenta w-full">
+                        <button class="bg-art-magenta text-white font-bold px-3 py-2 rounded-lg hover:bg-fuchsia-600 transition">Unirme</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-slate-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-600">
+                <p>&copy; 2026 Visuarium Academy & Lab. Inspirado en el arte libre e identidad consciente.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-slate-400">Términos de Uso</a>
+                    <a href="#" class="hover:text-slate-400">Privacidad</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL REGISTRO / PRUEBA -->
+    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" x-transition x-cloak>
+        <div class="glass-panel w-full max-w-md p-8 rounded-3xl border border-white/10 relative shadow-2xl" @click.away="modalOpen = false">
+            <button @click="modalOpen = false" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-art-magenta/10 border border-art-magenta/30 text-art-magenta flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i :class="modalType === 'login' ? 'fa-solid fa-user-check' : 'fa-solid fa-wand-magic-sparkles'"></i>
+                </div>
+                <h3 class="text-2xl font-black font-serif-title text-white" x-text="modalType === 'login' ? 'Bienvenido a Visuarium' : 'Comienza tu Prueba Gratis'"></h3>
+                <p class="text-xs text-slate-400 mt-1" x-text="selectedCourseTitle ? 'Seleccionado: ' + selectedCourseTitle : 'Desbloquea 7 días de acceso ilimitado a la plataforma'"></p>
+            </div>
+
+            <form @submit.prevent="submitModalForm()" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 mb-1">Nombre Completo</label>
+                    <input type="text" required placeholder="Tu Nombre de Artista" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-art-magenta">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 mb-1">Correo Electrónico</label>
+                    <input type="email" required placeholder="artista@dominio.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-art-magenta">
+                </div>
+
+                <div x-show="modalType === 'subscribe'" class="flex items-center gap-2 text-xs text-slate-400">
+                    <input type="checkbox" id="termsArt" required class="rounded bg-slate-900 border-slate-800 text-art-magenta focus:ring-0">
+                    <label for="termsArt">Acepto probar Visuarium por 7 días sin cargo</label>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-art-gold via-art-magenta to-art-cyan text-slate-950 font-black text-xs uppercase tracking-wider hover:opacity-90 transition shadow-lg flex items-center justify-center gap-2">
+                    <span x-text="modalType === 'login' ? 'Acceder a mi Taller' : 'Crear Cuenta y Probar'"></span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-xs text-slate-500">
+                <span x-text="modalType === 'login' ? '¿No tienes cuenta?' : '¿Ya eres alumno?'"></span>
+                <button @click="modalType = modalType === 'login' ? 'subscribe' : 'login'" class="text-art-gold font-bold hover:underline ml-1">
+                    <span x-text="modalType === 'login' ? 'Regístrate' : 'Inicia Sesión'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div x-show="toast.show" x-transition class="fixed bottom-6 right-6 z-50 glass-card px-5 py-3 rounded-2xl border border-art-gold/50 flex items-center gap-3 text-xs text-white shadow-2xl" x-cloak>
+        <i class="fa-solid fa-sparkles text-art-gold text-lg"></i>
+        <span x-text="toast.message"></span>
+    </div>
+
+    <!-- ALPINE & CANVAS SCRIPT -->
+    <script>
+        function visuariumApp() {
+            return {
+                mobileMenuOpen: false,
+                modalOpen: false,
+                modalType: 'subscribe',
+                selectedCourseTitle: '',
+                billingCycle: 'monthly',
+                courseFilter: 'all',
+
+                // Vibe Studio state
+                selectedStyleIndex: 0,
+                textureVal: 60,
+                colorVal: 85,
+                customArtPrompt: '',
+                currentPalette: ['#f59e0b', '#d946ef', '#06b6d4', '#8b5cf6', '#10b981'],
+                currentTechniqueAdvice: 'Combina pinceladas fluidas de acrílico diluido con retoques digitales de luz contrastada.',
+
+                // Styles preset
+                artStyles: [
+                    {
+                        name: 'Expresionismo Neón',
+                        subtitle: 'Trazos enérgicos + luz sintética',
+                        icon: 'fa-solid fa-bolt',
+                        palette: ['#d946ef', '#06b6d4', '#f43f5e', '#8b5cf6', '#fef08a'],
+                        advice: 'Aplica capas gruesas de espátula en el centro focal y contrasta con veladuras fluorescentes.'
+                    },
+                    {
+                        name: 'Óleo Minimal Botanique',
+                        subtitle: 'Paz estética, tonos orgánicos',
+                        icon: 'fa-solid fa-leaf',
+                        palette: ['#10b981', '#f59e0b', '#065f46', '#fef3c7', '#34d399'],
+                        advice: 'Trabaja el espacio negativo con matices neutros y utiliza pinceles finos para detalles botánicos.'
+                    },
+                    {
+                        name: 'Acuarela Onírica Cyber',
+                        subtitle: 'Transparencias y gradientes',
+                        icon: 'fa-solid fa-droplet',
+                        palette: ['#3b82f6', '#8b5cf6', '#ec4899', '#6366f1', '#a855f7'],
+                        advice: 'Aprovecha la técnica húmedo sobre húmedo con bordes limpios vectoriales.'
+                    },
+                    {
+                        name: 'Escultura Digital Fluida',
+                        subtitle: 'Volumen 3D y texturas orgánicas',
+                        icon: 'fa-solid fa-cubes',
+                        palette: ['#f59e0b', '#fbbf24', '#78350f', '#d97706', '#fef08a'],
+                        advice: 'Enfócate en la dirección de la luz especular para simular materiales metálicos o viscosos.'
+                    }
+                ],
+
+                // Quiz State
+                quizStep: 0,
+                quizCompleted: false,
+                userArchetype: 'visionario',
+                quizAnswers: [],
+
+                quizQuestions: [
+                    {
+                        question: '¿Qué sientes que impulsa primero tus obras?',
+                        options: [
+                            { text: 'Una emoción cruda o sensación física que necesita salir inmediatamente.', archetype: 'alquimista' },
+                            { text: 'Un concepto, mensaje filosófico o historia detrás de la imagen.', archetype: 'visionario' },
+                            { text: 'La fascinación por el comportamiento de un material o herramienta específica.', archetype: 'escultor' },
+                            { text: 'El deseo de armonía visual, composición perfecta e impacto estético.', archetype: 'sintetico' }
+                        ]
+                    },
+                    {
+                        question: '¿Cómo reaccionas ante los "errores" en tu lienzo o lienzo digital?',
+                        options: [
+                            { text: 'Los integro como parte del destino de la obra; el accidente crea magia.', archetype: 'alquimista' },
+                            { text: 'Analizo cómo el error modifica el concepto original y lo reestructuro.', archetype: 'visionario' },
+                            { text: 'Modifico la textura o capas circundantes para transformarlo físicamente.', archetype: 'escultor' },
+                            { text: 'Deshago o borro con precisión; busco pulcritud en la ejecución.', archetype: 'sintetico' }
+                        ]
+                    },
+                    {
+                        question: '¿Cuál es tu entorno ideal para crear?',
+                        options: [
+                            { text: 'Un estudio caótico lleno de manchas de pintura, música alta y libertad total.', archetype: 'alquimista' },
+                            { text: 'Un espacio tranquilo con libros de referencia, apuntes y luz natural.', archetype: 'visionario' },
+                            { text: 'Un taller híbrido rodeado de herramientas tradicionales y dispositivos digitales.', archetype: 'escultor' },
+                            { text: 'Un escritorio impecable con doble pantalla, tablet gráfica y paletas ordenadas.', archetype: 'sintetico' }
+                        ]
+                    }
+                ],
+
+                archetypeResults: {
+                    visionario: {
+                        title: 'El Visionario Conceptual',
+                        icon: 'fa-solid fa-brain',
+                        description: 'Tu verdadero arte no está solo en la superficie, sino en el significado profundo detrás de ella. Creas mundos cargados de simbolismo.',
+                        recommendation: 'Enfócate en el workshop "Discurso y Metativa Artística" para estructurar tus ideas en series exponibles.'
+                    },
+                    alquimista: {
+                        title: 'El Alquimista del Color',
+                        icon: 'fa-solid fa-fire-burner',
+                        description: 'Eres un explorador puramente intuitivo. Tu fortaleza radica en la energía cromática, la textura expresiva y la vibración emocional.',
+                        recommendation: 'Te beneficiarás enormemente del módulo "Pigmentos, Empastes y Luz Neón".'
+                    },
+                    escultor: {
+                        title: 'El Escultor de la Materia',
+                        icon: 'fa-solid fa-hand-holding-hand',
+                        description: 'Amas el volumen, las capas táctiles y la densidad de las superficies. Transformas lo plano en tridimensional.',
+                        recommendation: 'Prueba el curso "Técnicas Mixtas: Del Óleo al Relieve 3D".'
+                    },
+                    sintetico: {
+                        title: 'El Diseñador Sintético',
+                        icon: 'fa-solid fa-wand-magic-sparkles',
+                        description: 'Dominas la síntesis visual, las líneas pulidas y la elegancia contemporánea. Estás en el punto perfecto entre diseño y bellas artes.',
+                        recommendation: 'El taller "Vibe Art & Ilustración Digital Avanzada" potenció tu perfil.'
+                    }
+                },
+
+                // Courses
+                courses: [
+                    {
+                        id: 1,
+                        category: 'tecnica',
+                        level: 'Todos los niveles',
+                        badge: 'MÁS POPULAR',
+                        title: 'Encuentra tu Lenguaje Visual y Técnica Propia',
+                        description: 'Un viaje estructurado de 6 semanas para desaprender la imitación y consolidar un estilo con firma personal.',
+                        duration: '16 hrs',
+                        modules: 8,
+                        instructor: 'Valeria Solares',
+                        instructorInitials: 'VS',
+                        rating: '4.9',
+                        price: '$45',
+                        oldPrice: '$110',
+                        image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80'
+                    },
+                    {
+                        id: 2,
+                        category: 'digital',
+                        level: 'Intermedio',
+                        badge: 'VIBE ART',
+                        title: 'Alquimia Digital & Prompts Creativos para Artistas',
+                        description: 'Aprende a integrar herramientas de inteligencia artificial en tu proceso de bocetaje análogo sin perder tu sello de autor.',
+                        duration: '12 hrs',
+                        modules: 6,
+                        instructor: 'Kaelen Voss',
+                        instructorInitials: 'KV',
+                        rating: '5.0',
+                        price: '$59',
+                        oldPrice: '$130',
+                        image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&auto=format&fit=crop&q=80'
+                    },
+                    {
+                        id: 3,
+                        category: 'concepto',
+                        level: 'Avanzado',
+                        badge: 'MASTERCLASS',
+                        title: 'Composición de Gran Formato y Coherencia de Serie',
+                        description: 'Desarrolla colecciones completas orientadas a galerías, convocatorias culturales o portafolios profesionales.',
+                        duration: '22 hrs',
+                        modules: 10,
+                        instructor: 'Ignacio Larrea',
+                        instructorInitials: 'IL',
+                        rating: '4.8',
+                        price: '$69',
+                        oldPrice: '$160',
+                        image: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&auto=format&fit=crop&q=80'
+                    }
+                ],
+
+                // Gallery
+                galleryItems: [
+                    { title: 'Sinfonía en Magenta', author: 'Camila R.', archetype: 'Alquimista', technique: 'Óleo & Neón', image: 'https://images.unsplash.com/photo-1549887534-1541e9326642?w=500&auto=format&fit=crop&q=80' },
+                    { title: 'Geometría del Pensamiento', author: 'Mateo B.', archetype: 'Visionario', technique: 'Acrílico & Grafito', image: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=500&auto=format&fit=crop&q=80' },
+                    { title: 'Ecos de la Naturaleza Digital', author: 'Sora K.', archetype: 'Sintético', technique: 'Digital Render & Mist', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=500&auto=format&fit=crop&q=80' },
+                    { title: 'Relieve Dorado N° 4', author: 'Elena P.', archetype: 'Escultor', technique: 'Pasta de Textura & Pan de Oro', image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500&auto=format&fit=crop&q=80' }
+                ],
+
+                toast: { show: false, message: '' },
+
+                get filteredCourses() {
+                    if (this.courseFilter === 'all') return this.courses;
+                    return this.courses.filter(c => c.category === this.courseFilter);
+                },
+
+                init() {
+                    this.$nextTick(() => {
+                        this.initCanvas();
+                        this.selectArtStyle(0);
+                    });
+                },
+
+                // Canvas logic
+                canvas: null,
+                ctx: null,
+                isDrawing: false,
+
+                initCanvas() {
+                    this.canvas = document.getElementById('artCanvas');
+                    if (!this.canvas) return;
+                    this.ctx = this.canvas.getContext('2d');
+                    
+                    // Resize to fit container
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.canvas.width = rect.width;
+                    this.canvas.height = rect.height;
+
+                    // Canvas Events
+                    const startDraw = (e) => {
+                        this.isDrawing = true;
+                        this.drawPoint(e);
+                    };
+                    const stopDraw = () => { this.isDrawing = false; this.ctx.beginPath(); };
+                    const moveDraw = (e) => {
+                        if (this.isDrawing) this.drawPoint(e);
+                    };
+
+                    this.canvas.addEventListener('mousedown', startDraw);
+                    this.canvas.addEventListener('mouseup', stopDraw);
+                    this.canvas.addEventListener('mousemove', moveDraw);
+
+                    this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e.touches[0]); });
+                    this.canvas.addEventListener('touchend', stopDraw);
+                    this.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); moveDraw(e.touches[0]); });
+
+                    this.clearCanvas();
+                },
+
+                drawPoint(e) {
+                    if (!this.ctx) return;
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = (e.clientX || e.pageX) - rect.left;
+                    const y = (e.clientY || e.pageY) - rect.top;
+
+                    const color = this.currentPalette[Math.floor(Math.random() * this.currentPalette.length)];
+                    const size = (this.textureVal / 100) * 25 + 5;
+
+                    this.ctx.lineWidth = size;
+                    this.ctx.lineCap = 'round';
+                    this.ctx.strokeStyle = color;
+                    this.ctx.shadowBlur = (this.colorVal / 100) * 15;
+                    this.ctx.shadowColor = color;
+
+                    this.ctx.lineTo(x, y);
+                    this.ctx.stroke();
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, y);
+                },
+
+                clearCanvas() {
+                    if (!this.ctx) return;
+                    this.ctx.fillStyle = '#0a0812';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.renderBackgroundArt();
+                },
+
+                renderBackgroundArt() {
+                    if (!this.ctx) return;
+                    // Draw artistic generative organic spots
+                    for (let i = 0; i < 5; i++) {
+                        const x = Math.random() * this.canvas.width;
+                        const y = Math.random() * this.canvas.height;
+                        const radius = Math.random() * 80 + 20;
+                        const color = this.currentPalette[i % this.currentPalette.length];
+
+                        const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, radius);
+                        gradient.addColorStop(0, color + '66');
+                        gradient.addColorStop(1, 'transparent');
+
+                        this.ctx.fillStyle = gradient;
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, radius, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                },
+
+                selectArtStyle(index) {
+                    this.selectedStyleIndex = index;
+                    const style = this.artStyles[index];
+                    this.currentPalette = style.palette;
+                    this.currentTechniqueAdvice = style.advice;
+                    this.clearCanvas();
+                },
+
+                updateCanvas() {
+                    // Slight re-rendering on slider change
+                    this.showToast("Parámetros cromáticos actualizados");
+                },
+
+                randomizeArt() {
+                    this.textureVal = Math.floor(Math.random() * 80) + 20;
+                    this.colorVal = Math.floor(Math.random() * 80) + 20;
+                    this.clearCanvas();
+                    this.showToast("✨ Muta artística generada");
+                },
+
+                applyCustomPrompt() {
+                    if (!this.customArtPrompt.trim()) return;
+                    this.clearCanvas();
+                    this.currentTechniqueAdvice = `Interpretando prompt: "${this.customArtPrompt}". Sugerencia: Aplica técnica mixta con contrastes lumínicos.`;
+                    this.showToast("Prompt transformado en intención estética");
+                    this.customArtPrompt = '';
+                },
+
+                // Quiz Logic
+                answerQuestion(archetype) {
+                    this.quizAnswers.push(archetype);
+                    if (this.quizStep < this.quizQuestions.length - 1) {
+                        this.quizStep++;
+                    } else {
+                        // Calculate result
+                        const counts = {};
+                        this.quizAnswers.forEach(a => counts[a] = (counts[a] || 0) + 1);
+                        let top = 'visionario';
+                        let max = 0;
+                        for (let k in counts) {
+                            if (counts[k] > max) { max = counts[k]; top = k; }
+                        }
+                        this.userArchetype = top;
+                        this.quizCompleted = true;
+                    }
+                },
+
+                resetQuiz() {
+                    this.quizStep = 0;
+                    this.quizAnswers = [];
+                    this.quizCompleted = false;
+                },
+
+                openModal(type, title = '') {
+                    this.modalType = type;
+                    this.selectedCourseTitle = title;
+                    this.modalOpen = true;
+                },
+
+                submitModalForm() {
+                    this.modalOpen = false;
+                    this.showToast("🎉 ¡Registro exitoso! Revisa tu correo para comenzar tu acceso gratis.");
+                },
+
+                showToast(msg) {
+                    this.toast.message = msg;
+                    this.toast.show = true;
+                    setTimeout(() => { this.toast.show = false; }, 3500);
+                },
+
+                scrollTo(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
